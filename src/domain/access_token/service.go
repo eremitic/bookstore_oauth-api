@@ -1,6 +1,9 @@
 package access_token
 
-import "github.com/eremitic/bookstore_oauth-api/src/domain/utils/errors"
+import (
+	"github.com/eremitic/bookstore_oauth-api/src/domain/utils/errors"
+	"strings"
+)
 
 type Service interface {
 	GetById(string) (*AccessToken, *errors.RestErr)
@@ -22,6 +25,10 @@ func NewService(repo Repository) Service {
 }
 
 func (s *service) GetById(accessTokenId string) (*AccessToken, *errors.RestErr) {
+	accessTokenId = strings.TrimSpace(accessTokenId)
+	if len(accessTokenId) == 0 {
+		return nil, errors.NewBadReqErr("invalid token id")
+	}
 	accessToken, err := s.repository.GetById(accessTokenId)
 	if err != nil {
 		return nil, err
