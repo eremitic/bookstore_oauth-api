@@ -1,6 +1,8 @@
 package access_token
 
 import (
+	"github.com/eremitic/bookstore_oauth-api/src/domain/utils/errors"
+	"strings"
 	"time"
 )
 
@@ -24,4 +26,21 @@ func (at AccessToken) IsExpired() bool {
 	expirationTime := time.Unix(at.Expires, 0)
 
 	return expirationTime.Before(now)
+}
+
+func (at *AccessToken) Validate() *errors.RestErr {
+	at.AccessToken = strings.TrimSpace(at.AccessToken)
+	if at.AccessToken == "" {
+		return errors.NewBadReqErr("invalid token id")
+	}
+	if at.UserId <= 0 {
+		return errors.NewBadReqErr("invalid user id")
+	}
+	if at.ClientId <= 0 {
+		return errors.NewBadReqErr("invalid client id")
+	}
+	if at.Expires <= 0 {
+		return errors.NewBadReqErr("invalid expire")
+	}
+	return nil
 }
